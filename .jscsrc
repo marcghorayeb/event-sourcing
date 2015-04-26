@@ -1,0 +1,50 @@
+{
+	"validateIndentation": "\t",
+
+	"requireSpaceAfterKeywords": [
+		"if",
+		"else",
+		"for",
+		"while",
+		"do",
+		"switch",
+		"case",
+		"return",
+		"try",
+		"catch",
+		"typeof"
+	],
+
+	"requireSpacesInNamedFunctionExpression": {
+		"beforeOpeningCurlyBrace": true
+	},
+	"disallowSpacesInNamedFunctionExpression": {
+		"beforeOpeningRoundBrace": true
+	},
+	"requireSpacesInAnonymousFunctionExpression": {
+		"beforeOpeningRoundBrace": true,
+		"beforeOpeningCurlyBrace": true
+	},
+	"validateParameterSeparator": ", ",
+
+	"disallowMultipleVarDecl": true,
+
+	"requireSpacesInConditionalExpression": true,
+	"disallowYodaConditions": true,
+
+	"disallowSpacesInsideParentheses": true,
+	"requireSpacesInsideObjectBrackets": "all",
+	"disallowSpaceAfterObjectKeys": true,
+	"requireSpaceBeforeObjectValues": true,
+	"requireSpacesInsideArrayBrackets": "all",
+	"disallowTrailingComma": true,
+
+	"requireSpaceAfterLineComment": true,
+
+	"requireSpaceBeforeBlockStatements": true,
+	"disallowNewlineBeforeBlockStatements": true,
+	"disallowPaddingNewlinesInBlocks": true,
+
+	"disallowTrailingWhitespace": true,
+	"validateLineBreaks": "LF"
+}
