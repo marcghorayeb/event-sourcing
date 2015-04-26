@@ -2,13 +2,14 @@
   "name": "event-sourcing",
   "version": "0.0.1",
   "description": "NodeJS Event-sourcing POC",
+  "keywords": [ "cqrs", "event", "sourcing", "event-sourcing", "eventsource", "eventsourcing", "ddd", "eventstore" ],
   "main": "event-sourcing.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/marcghorayeb/event-sourcing"
+    "url": "git://github.com/marcghorayeb/event-sourcing"
   },
   "author": "Marc Ghorayeb <code@marcghorayeb.com>",
   "license": "ISC",
