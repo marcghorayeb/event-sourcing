@@ -4,6 +4,7 @@ var MongoClient = require('mongodb').MongoClient;
 
 function MongoDB(config) {
 	this.uri = config;
+	this.col = null;
 
 	if (_.isObject(this.uri)) {
 		_.defaults(this.uri, {
@@ -28,10 +29,20 @@ MongoDB.prototype.connect = function (callback) {
 
 	var self = this;
 	MongoClient.connect(this.uri, function (err, db) {
-		if (err) throw err;
-		self.db = db;
-		callback(err, db);
+		if (err) return callback(err);
+
+		db.collection('events', function (err, col) {
+			if (err) return callback(err);
+
+			self.db = db;
+			self.col = col;
+			callback();
+		});
 	});
+};
+
+MongoDB.prototype.persistEvent = function (event, callback) {
+	this.col.insertOne(event, callback);
 };
 
 module.exports = MongoDB;

@@ -3,30 +3,33 @@ var amqplib = require('amqplib');
 var format = require('util').format;
 
 function AMQP(config) {
-	var uri = config;
+	this.config = config;
+	this.uri = config;
 
-	if (_.isObject(uri)) {
-		_.defaults(uri, {
+	if (_.isObject(this.uri)) {
+		_.defaults(this.uri, {
 			user: '',
 			password: '',
 			host: '',
 			vhost: ''
 		});
 
-		uri = format(
+		this.uri = format(
 			'amqp://%s:%s@%s/%s',
-			uri.user,
-			uri.password,
-			uri.host,
-			uri.vhost
+			this.uri.user,
+			this.uri.password,
+			this.uri.host,
+			this.uri.vhost
 		);
 	}
 
-	if (!_.isString(uri) || !uri) throw new Error('Malformed config');
+	if (!_.isString(this.uri) || !this.uri) throw new Error('Malformed config');
+}
 
-	return amqplib.connect(uri).then(function (conn) {
+AMQP.prototype.connect = function () {
+	return amqplib.connect(this.uri).then(function (conn) {
 		return conn.createChannel();
 	});
-}
+};
 
 module.exports = AMQP;

@@ -1,36 +1,35 @@
-var amqp = require('./amqp');
 var uuid = require('node-uuid');
+var AMQP = require('./amqp.js');
+var Storage = require('./storage.js');
 
-function Publisher(amqp, db) {
-	this.amqp = amqp;
-
-	var self = this;
-	db.collection('events', function (err, col) {
-		self.col = col;
-	});
+function Publisher(config) {
+	this.amqp = new AMQP(config.amqp);
+	this.storage = new Storage(config.storage);
 }
 
 Publisher.prototype.connect = function (callback) {
 	var self = this;
-	this.amqp.then(function (channel) {
-		self.channel = channel;
-		callback(channel);
+
+	this.storage.initAdapters(function (err) {
+		if (err) return callback(err);
+
+		this.amqp.connect().then(function (channel) {
+			self.channel = channel;
+			callback(null, channel);
+		}, callback);
 	});
 };
 
 Publisher.prototype.askRPC = function (queue, event, callback) {
 	var self = this;
 	this.persistEvent(event, function (err) {
-		if (err) throw err;
+		if (err) return callback(err);
 		self.emitEvent(queue, event, callback);
 	});
 };
 
 Publisher.prototype.persistEvent = function (event, callback) {
-	this.col.insertOne(event, function (err, results) {
-		if (err) throw err;
-		callback(err, results);
-	});
+	this.storage.persistEvent(event, callback);
 };
 
 Publisher.prototype.assertReplyQueue = function () {

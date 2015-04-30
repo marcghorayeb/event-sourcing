@@ -1,5 +1,5 @@
-var consumer = require('consumer');
-var publisher = require('publisher');
+var consumer = require('./consumer.js');
+var publisher = require('./publisher.js');
 
 module.exports = {
 	consumer: consumer,

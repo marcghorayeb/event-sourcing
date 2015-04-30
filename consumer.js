@@ -1,33 +1,36 @@
-function Consumer(amqp) {
+var AMQP = require('./amqp.js');
+
+function Consumer(config) {
 	if (!this.domain) throw new Error('Missing domain property');
-	if (!amqp) throw new Error('Missing amqp connection');
+	if (!config) throw new Error('Missing amqp config');
 
-	this.amqp = amqp;
-
-	this.consume(this.domain, this.handleEvent.bind(this));
+	this.amqp = new AMQP(config);
 }
 
-Consumer.prototype.connect = function (callback) {
+Consumer.prototype.consume = function (callback) {
 	var self = this;
-	this.amqp.then(function (channel) {
-		self.channel = channel;
-		callback(channel);
-	});
+	var queue = this.domain;
+
+	this.amqp.connect().then(function (channel) {
+		channel.assertQueue(queue);
+		channel.consume(queue, self.handleMessage.bind(self));
+	}).then(callback, callback);
 };
 
-Consumer.prototype.consume = function (queue, callback) {
-	var self = this;
+Consumer.prototype.handleMessage = function (msg) {
+	function onProcessed(err, results) {
+		this.channel.ack(msg);
 
-	this.channel.assertQueue(queue);
+		if (!msg.properties.replyTo) return;
 
-	this.channel.consume(queue, function (msg) {
-		self.handleMessage(msg, callback);
-	});
-};
+		var reply = { err: err, results: results };
+		var rpcConfig = { correlationId: msg.properties.correlationId };
 
-Consumer.prototype.handleMessage = function (msg, callback) {
-	var data = JSON.parse(msg.content.toString());
-	callback(data, this.onProcessed.bind(this));
+		this.channel.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(reply)), rpcConfig);
+	}
+
+	var event = JSON.parse(msg.content.toString());
+	this.handleEvent(event, onProcessed.bind(this));
 };
 
 Consumer.prototype.handleEvent = function (event, callback) {
@@ -36,15 +39,5 @@ Consumer.prototype.handleEvent = function (event, callback) {
 	this.projections[event.type].bind(this)(event.data || event.args || {}, callback);
 };
 
-Consumer.prototype.onProcessed = function (err, results) {
-	this.channel.ack(msg);
-
-	if (!msg.properties.replyTo) return;
-
-	var reply = { err: err, results: results };
-	var rpcConfig = { correlationId: msg.properties.correlationId };
-
-	this.channel.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(reply)), rpcConfig);
-};
 
 module.exports = Consumer;
