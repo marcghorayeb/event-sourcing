@@ -2,7 +2,16 @@
   "name": "event-sourcing",
   "version": "0.0.1",
   "description": "NodeJS Event-sourcing POC",
-  "keywords": [ "cqrs", "event", "sourcing", "event-sourcing", "eventsource", "eventsourcing", "ddd", "eventstore" ],
+  "keywords": [
+    "cqrs",
+    "event",
+    "sourcing",
+    "event-sourcing",
+    "eventsource",
+    "eventsourcing",
+    "ddd",
+    "eventstore"
+  ],
   "main": "event-sourcing.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -19,6 +28,8 @@
   "homepage": "https://github.com/marcghorayeb/event-sourcing",
   "dependencies": {
     "amqplib": "^0.3.2",
+    "async": "^0.9.0",
+    "chai": "^2.3.0",
     "lodash": "^3.7.0",
     "mongodb": "^2.0.28",
     "node-uuid": "^1.4.3"
