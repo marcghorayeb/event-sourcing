@@ -1,8 +1,6 @@
 var async = require('async');
 var format = require('util').format;
 
-var adapters = [ 'mongodb', 'fs' ];
-
 function Storage(config) {
 	if (!config.adapters.length) throw new Error('No defined adapters');
 
@@ -10,8 +8,10 @@ function Storage(config) {
 	this.adapters = [];
 }
 
-Storage.prototype.isAdapterAvailable = function (adapter) {
-	return adapter && (adapters.indexOf(adapter.toLowerCase()) !== -1);
+Storage.adapters = [ 'memory', 'mongodb', 'fs' ];
+
+Storage.isAdapterAvailable = function (adapter) {
+	return adapter && (Storage.adapters.indexOf(adapter.toLowerCase()) !== -1);
 };
 
 Storage.prototype.initAdapters = function (done) {
@@ -23,7 +23,7 @@ Storage.prototype.initAdapters = function (done) {
 };
 
 Storage.prototype.initAdapter = function (config, adapterName, done) {
-	if (!this.isAdapterAvailable(adapterName)) return done(new Error('Missing storage adapter'));
+	if (!Storage.isAdapterAvailable(adapterName)) return done(new Error('Missing storage adapter'));
 
 	var Adapter = require(format('./storage/%s.js', adapterName));
 	var adapter = new Adapter(config);
@@ -31,12 +31,13 @@ Storage.prototype.initAdapter = function (config, adapterName, done) {
 
 	adapter.connect(function (err) {
 		if (err) return done(err);
-		self.adapters.push(adapterName, adapter);
+		self.adapters.push(adapter);
 		done();
 	});
 };
 
 Storage.prototype.persistEvent = function (event, done) {
+	event.createdAt = new Date();
 	async.each(this.adapters, function (adapter, done) {
 		adapter.persistEvent(event, done);
 	}, done);
