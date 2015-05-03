@@ -3,6 +3,8 @@ var AMQP = require('./amqp.js');
 var Storage = require('./storage.js');
 
 function Publisher(config) {
+	if (!this.domain) throw new Error('Missing domain property');
+
 	this.amqp = new AMQP(config.amqp);
 	this.storage = new Storage(config.storage);
 }
@@ -20,11 +22,11 @@ Publisher.prototype.connect = function (callback) {
 	});
 };
 
-Publisher.prototype.askRPC = function (queue, event, callback) {
+Publisher.prototype.askRPC = function (event, callback) {
 	var self = this;
 	this.persistEvent(event, function (err) {
 		if (err) return callback(err);
-		self.emitEvent(queue, event, callback);
+		self.emitEvent(event, callback);
 	});
 };
 
@@ -38,8 +40,9 @@ Publisher.prototype.assertReplyQueue = function () {
 	});
 };
 
-Publisher.prototype.emitEvent = function (queue, event, callback) {
+Publisher.prototype.emitEvent = function (event, callback) {
 	event = new Buffer(JSON.stringify(event));
+	var queue = this.domain;
 
 	if (!callback) return this.channel.sendToQueue(queue, event);
 
