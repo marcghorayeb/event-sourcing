@@ -12,21 +12,25 @@ Consumer.prototype.consume = function (callback) {
 	var queue = this.domain;
 
 	this.amqp.connect().then(function (channel) {
+		self.channel = channel;
+
 		channel.assertQueue(queue);
 		channel.consume(queue, self.handleMessage.bind(self));
 	}).then(callback, callback);
 };
 
 Consumer.prototype.handleMessage = function (msg) {
+	var self = this;
+
 	function onProcessed(err, results) {
-		this.channel.ack(msg);
+		self.channel.ack(msg);
 
 		if (!msg.properties.replyTo) return;
 
 		var reply = { err: err, results: results };
 		var rpcConfig = { correlationId: msg.properties.correlationId };
 
-		this.channel.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(reply)), rpcConfig);
+		self.channel.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(reply)), rpcConfig);
 	}
 
 	var event = JSON.parse(msg.content.toString());
