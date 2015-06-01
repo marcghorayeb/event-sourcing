@@ -23,6 +23,8 @@ Consumer.prototype.handleMessage = function (msg) {
 	var self = this;
 
 	function onProcessed(err, results) {
+		if (err) return self.onConsumerError && self.onConsumerError(err, msg);
+
 		self.channel.ack(msg);
 
 		if (!msg.properties.replyTo) return;
