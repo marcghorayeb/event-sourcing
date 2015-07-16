@@ -15,7 +15,7 @@ Publisher.prototype.connect = function (callback) {
 	this.storage.initAdapters(function (err) {
 		if (err) return callback(err);
 
-		this.amqp.connect().then(function (channel) {
+		self.amqp.connect().then(function (channel) {
 			self.channel = channel;
 			callback(null, channel);
 		}, callback);
