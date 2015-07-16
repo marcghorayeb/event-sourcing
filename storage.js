@@ -8,7 +8,7 @@ function Storage(config) {
 	this.adapters = [];
 }
 
-Storage.adapters = [ 'memory', 'mongodb', 'fs' ];
+Storage.adapters = [ 'none', 'memory', 'mongodb', 'fs' ];
 
 Storage.isAdapterAvailable = function (adapter) {
 	return adapter && (Storage.adapters.indexOf(adapter.toLowerCase()) !== -1);
@@ -24,6 +24,8 @@ Storage.prototype.initAdapters = function (done) {
 
 Storage.prototype.initAdapter = function (config, adapterName, done) {
 	if (!Storage.isAdapterAvailable(adapterName)) return done(new Error('Missing storage adapter'));
+
+	if (adapterName === 'none') return done();
 
 	var Adapter = require(format('./storage/%s.js', adapterName));
 	var adapter = new Adapter(config);
