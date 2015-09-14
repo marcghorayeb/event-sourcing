@@ -35,8 +35,12 @@ Consumer.prototype.handleMessage = function (msg) {
 		self.channel.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(reply)), rpcConfig);
 	}
 
-	var event = JSON.parse(msg.content.toString());
-	this.handleEvent(event, onProcessed.bind(this));
+	try {
+		var event = JSON.parse(msg.content.toString());
+		this.handleEvent(event, onProcessed.bind(this));
+	} catch (e) {
+		onProcessed(e);
+	}
 };
 
 Consumer.prototype.handleEvent = function (event, callback) {
