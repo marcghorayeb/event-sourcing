@@ -45,7 +45,7 @@ Consumer.prototype.handleMessage = function (msg) {
 
 Consumer.prototype.handleEvent = function (event, callback) {
 	if (!event.type) throw new Error('Missing event type');
-	if (!this.projections[event.type]) throw new Error('No projections for ' + event.type);
+	if (!this.projections[event.type]) return callback(new Error('No projection found for ' + event.type));
 	this.projections[event.type].bind(this)(event.data || event.args || {}, callback);
 };
 
