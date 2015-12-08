@@ -1,6 +1,6 @@
 {
   "name": "event-sourcing",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "NodeJS Event-sourcing POC",
   "keywords": [
     "cqrs",
